@@ -9,11 +9,7 @@ submission to_:
 > Worley, B., _Expectation Propagation for sparse Bayesian learning_,
 > Journal of Machine Learning Research, 2018.
 
-## Introduction
-
-Fix me...
-
-### Compilation
+## Compilation
 
 Bear with me, compilation is a bit non-standard.
 
