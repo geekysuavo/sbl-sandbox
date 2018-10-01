@@ -43,7 +43,7 @@ constexpr double lambda = 0.00125;
  *  @burn: (monte carlo) burn-in iteration count.
  *  @thin: (monte carlo) thinning iteration count.
  */
-constexpr std::size_t iters = 5000;//11000;
+constexpr std::size_t iters = 11000;
 constexpr std::size_t burn = 1000;
 constexpr std::size_t thin = 1;
 
