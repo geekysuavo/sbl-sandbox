@@ -16,21 +16,8 @@ int main (int argc, char **argv) {
   if (argc >= 2) alpha = atof(argv[1]);
   if (argc >= 3) beta  = atof(argv[2]);
 
-  /* define a function that maps a univariate normal distribution
-   * into another using the F- and G-functions.
-   */
-  auto map = [alpha, beta] (double mean, double var) 
-           -> std::pair<double, double> {
-    static gamma_util<1> fxi(alpha, beta);
-
-    const double F = fxi.F(1 / var);
-    const double G = fxi.G(1 / var);
-
-    const double new_mean = mean * F;
-    const double new_var = var * F + std::pow(mean, 2) * (G - F * F);
-
-    return {new_mean, new_var};
-  };
+  /* declare a gamma utility class for transforming distributions. */
+  gamma_util<1> fxi(alpha, beta);
 
   /* loop over all initial mean and variance values. */
   for (double i_var = 1e2; i_var <= 1e6; i_var *= 2) {
@@ -41,7 +28,7 @@ int main (int argc, char **argv) {
       /* trace the path of distributions from the initial values. */
       bool feasible = false;
       do {
-        auto [new_mean, new_var] = map(mean, var);
+        auto [new_mean, new_var] = fxi.map(mean, var);
         feasible = (new_var > 0.001 && 1 / new_var > 1 / var);
 
         std::cout << mean << " " << var << "\n";

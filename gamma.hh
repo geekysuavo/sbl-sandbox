@@ -8,6 +8,7 @@
 #include <cmath>
 #include <random>
 #include <cstddef>
+#include <utility>
 #include <stdexcept>
 #include <boost/math/special_functions/gamma.hpp>
 
@@ -102,6 +103,22 @@ public:
     const double z = _beta * x;
 
     return (s - z) * F(x) + z;
+  }
+
+  /* map(): transform a univariate normal distribution into another.
+   */
+  std::pair<double, double> map (double mean, double var) const {
+    /* compute the values of the F- and G-functions. */
+    const double prec = 1 / var;
+    const double f = F(prec);
+    const double g = G(prec);
+
+    /* compute the new mean and variance. */
+    const double new_mean = mean * f;
+    const double new_var = var * f + std::pow(mean, 2) * (g - f * f);
+
+    /* return the new distribution as a mean-variance pair. */
+    return {new_mean, new_var};
   }
 
   /* weight(): function to get quadrature weights.
