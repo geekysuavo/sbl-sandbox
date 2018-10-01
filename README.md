@@ -15,7 +15,7 @@ Fix me...
 
 ### Compilation
 
-Fix me... compilation is a bit non-standard.
+Bear with me, compilation is a bit non-standard.
 
 To compile a source file, a problem instance, _e.g._ __instance.hh__, is
 paired with a solver, _e.g._ __gs.cc__. To build a solver against the
