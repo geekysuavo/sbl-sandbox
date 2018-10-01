@@ -11,14 +11,15 @@
 #include <stdexcept>
 #include <boost/math/special_functions/gamma.hpp>
 
-/* GammaBase: class holding the basic functionality common to all
- * gamma distributions.
+/* gamma_util: class holding extra functionalities of gamma distributions
+ * not available from std::gamma_distribution<double>.
  */
-class GammaBase {
+template<std::size_t n>
+class gamma_util {
 public:
-  GammaBase () : GammaBase(1, 1) {}
+  gamma_util () : gamma_util(1, 1) {}
 
-  GammaBase (double a, double b) : _alpha(0), _beta(0), gen(), rdist() {
+  gamma_util (double a, double b) : _alpha(0), _beta(0), gen(), rdist() {
     /* set the distribution parameters. */
     set(a, b);
 
@@ -51,6 +52,9 @@ public:
     /* store the new parameter values. */
     _alpha = a;
     _beta = b;
+
+    /* update the quadrature rule. */
+    compute_rule();
   }
 
   /* draw(): sample a value from the distribution.
@@ -100,55 +104,6 @@ public:
     return (s - z) * F(x) + z;
   }
 
-protected:
-  /* distribution parameters:
-   *  @_alpha: shape.
-   *  @_beta: rate.
-   */
-  double _alpha, _beta;
-
-private:
-  /* random sampling members:
-   *  @gen: pseudorandom number generator.
-   *  @rdist: random distribution.
-   */
-  std::default_random_engine gen;
-  std::gamma_distribution<double> rdist;
-};
-
-/* Gamma<0>: class template for instantiating gamma distributions
- * having no quadrature rule.
- */
-template<std::size_t n = 0, bool has_rule = (n > 0)>
-class Gamma : public GammaBase {
-  using GammaBase::GammaBase;
-};
-
-/* Gamma<n>: partial class template specialization for instantiating
- * gamma distributions having a quadrature rule.
- *
- * parameters:
- *  @n: number of nodes in the quadrature rule. [n > 0]
- */
-template<std::size_t n>
-class Gamma<n, true> : public GammaBase {
-public:
-  /* Gamma(): overrides GammaBase::GammaBase(). */
-  Gamma () : Gamma(1, 1) {}
-  Gamma (double a, double b) : GammaBase(a, b), w{0}, x{0} {
-    compute_rule();
-  }
-
-  /* alpha(double), beta(double): overrides the GammaBase setters. */
-  void alpha (double a) { set(a, _beta); }
-  void beta (double b) { set(_alpha, b); }
-
-  /* set(): overrides GammaBase::set() */
-  void set (double a, double b) {
-    GammaBase::set(a, b);
-    compute_rule();
-  }
-
   /* weight(): function to get quadrature weights.
    */
   double weight (std::size_t k) const {
@@ -176,6 +131,19 @@ public:
   }
 
 private:
+  /* distribution parameters:
+   *  @_alpha: shape.
+   *  @_beta: rate.
+   */
+  double _alpha, _beta;
+
+  /* random sampling members:
+   *  @gen: pseudorandom number generator.
+   *  @rdist: random distribution.
+   */
+  std::default_random_engine gen;
+  std::gamma_distribution<double> rdist;
+
   /* quadrature members:
    *  @w: weights.
    *  @x: nodes.

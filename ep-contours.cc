@@ -21,7 +21,7 @@ int main (int argc, char **argv) {
    */
   auto map = [alpha, beta] (double mean, double var) 
            -> std::pair<double, double> {
-    static Gamma<0> fxi(alpha, beta);
+    static gamma_util<1> fxi(alpha, beta);
 
     const double F = fxi.F(1 / var);
     const double G = fxi.G(1 / var);
