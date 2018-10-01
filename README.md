@@ -1,7 +1,17 @@
 
 # EP-SBL
 
-__"Expectation Propagation (EP) for sparse Bayesian learning (SBL)"__
+Fix me...
+
+These sources support the following manuscript, _in preparation for
+submission to_:
+
+> Worley, B., _Expectation Propagation for sparse Bayesian learning_,
+> Journal of Machine Learning Research, 2018.
+
+## Introduction
+
+Fix me...
 
 ### Compilation
 

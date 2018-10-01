@@ -10,6 +10,11 @@ int main () {
   /* declare variables for sampling tau, xi. */
   std::gamma_distribution<double> gam;
   using gam_param_t = typename decltype(gam)::param_type;
+  auto gamrnd = [&] (double a, double b) -> double {
+    gam_param_t gpar{a, 1 / b};
+    gam.param(gpar);
+    return gam(gen);
+  };
 
   /* initialize the noise sample. */
   double tau = 0;
@@ -42,16 +47,12 @@ int main () {
 
     /* sample tau. */
     const double t_lambda = lambda + 0.5 * ess;
-    gam_param_t gpar{t_nu, 1 / t_lambda};
-    gam.param(gpar);
-    tau = gam(gen);
+    tau = gamrnd(t_nu, t_lambda);
 
     /* sample xi. */
     for (std::size_t j = 0; j < n; j++) {
       const double t_beta = beta + 0.5 * std::pow(x(j), 2);
-      gam_param_t gpar{t_alpha, 1 / t_beta};
-      gam.param(gpar);
-      xi(j) = gam(gen);
+      xi(j) = gamrnd(t_alpha, t_beta);
     }
 
     /* draw an m-vector of standard normal variates. */
