@@ -2,11 +2,13 @@
 
 # import the required modules.
 import sys
+from builders.make_clean import *
 from builders.make_solver import *
 from builders.make_instance import *
 
 # define the set of scripts that can be executed.
 scripts = {
+  'clean': make_clean,
   'solver': make_solver,
   'instance': make_instance
 }

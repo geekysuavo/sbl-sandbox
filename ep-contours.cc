@@ -20,23 +20,24 @@ int main (int argc, char **argv) {
   gamma_util<1> fxi(alpha, beta);
 
   /* loop over all initial mean and variance values. */
-  for (double i_var = 1e2; i_var <= 1e6; i_var *= 2) {
+  for (double i_var = 1e-6; i_var <= 1e6; i_var *= 2) {
     for (double i_mean = -10; i_mean <= 10; i_mean += 20) {
       double mean = i_mean;
       double var = i_var;
 
       /* trace the path of distributions from the initial values. */
-      bool feasible = false;
-      do {
-        auto [new_mean, new_var] = fxi.map(mean, var);
-        feasible = (new_var > 0.001 && 1 / new_var > 1 / var);
+      while (true) {
+        const auto [new_mean, new_var] = fxi.map(mean, var);
+        const bool feasible = (new_var > 0.001 && 1 / new_var > 1 / var);
+
+        if (!feasible)
+          break;
 
         std::cout << mean << " " << var << "\n";
 
         mean = new_mean;
         var = new_var;
       }
-      while (feasible);
 
       std::cout << std::endl;
     }
