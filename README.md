@@ -34,7 +34,12 @@ Instance files may be created using __build.py__ like so:
 ```bash
 ./build.py instance k=13 > instanceK13.hh
 ```
-which overrides the default _k_ parameter in __instance.hh__.
+which overrides the default _k_ parameter in __instance.hh__. To remove
+all compiled executables, you can run:
+
+```bash
+./build.py clean
+```
 
 ## Licensing
 
