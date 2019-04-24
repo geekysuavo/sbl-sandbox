@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2018 Bradley Worley <geekysuavo@gmail.com>
+/* Copyright (c) 2018-2019 Bradley Worley <geekysuavo@gmail.com>
  * Released under the MIT License.
  */
 
@@ -25,18 +25,18 @@ constexpr double sigma = 0.005;
 constexpr std::size_t seed = 47351;
 
 /* weight prior parameters:
- *  @alpha: shape.
- *  @beta: rate.
+ *  @alpha0: shape.
+ *  @beta0: rate.
  */
-constexpr double alpha = 0.001;
-constexpr double beta = 0.001;
+constexpr double alpha0 = 0.001;
+constexpr double beta0 = 0.001;
 
 /* noise prior parameters:
- *  @nu: shape.
- *  @lambda: rate.
+ *  @nu0: shape.
+ *  @lambda0: rate.
  */
-constexpr double nu = 50;
-constexpr double lambda = 0.00125;
+constexpr double nu0 = 50;
+constexpr double lambda0 = 0.00125;
 
 /* algorithm parameters:
  *  @iters: iteration count.

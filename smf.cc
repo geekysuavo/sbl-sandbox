@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2018 Bradley Worley <geekysuavo@gmail.com>
+/* Copyright (c) 2018-2019 Bradley Worley <geekysuavo@gmail.com>
  * Released under the MIT License.
  */
 
@@ -19,14 +19,14 @@ int main () {
 
   /* initialize the precision means. */
   Eigen::Matrix<double, n, 1> xi;
-  xi.setConstant(alpha / beta);
+  xi.setConstant(alpha0 / beta0);
 
   /* initialize the noise mean. */
-  double tau = nu / lambda;
+  double tau = nu0 / lambda0;
 
   /* compute the updated shape parameters. */
-  const double t_alpha = alpha + 0.5;
-  const double t_nu = nu + 0.5 * m;
+  const double alpha = alpha0 + 0.5;
+  const double nu = nu0 + 0.5 * m;
 
   /* iterate. */
   for (std::size_t it = 0; it < iters; it++) {
@@ -47,15 +47,15 @@ int main () {
     /* update the precision means. */
     for (std::size_t i = 0; i < n; i++) {
       const double mu2 = std::pow(mu(i), 2) + sigma(i);
-      const double t_beta = beta + 0.5 * mu2;
-      xi(i) = t_alpha / t_beta;
+      const double beta = beta0 + 0.5 * mu2;
+      xi(i) = alpha / beta;
     }
 
     /* update the noise. */
     const double mess = (y - A * mu).squaredNorm();
     const double trAAS = K.trace() - (K * Q * K).trace();
-    const double t_lambda = lambda + 0.5 * mess + 0.5 * trAAS;
-    tau = t_nu / t_lambda;
+    const double lambda = lambda0 + 0.5 * mess + 0.5 * trAAS;
+    tau = nu / lambda;
   }
 
   /* output the final means. */

@@ -46,12 +46,12 @@ def make_instance(argv = (), usage = False, verbose = False):
     'seed':  (typed_size_t, 47351),
 
     '3':      (typed_comment, 'weight prior parameters'),
-    'alpha':  (typed_double, 0.001),
-    'beta':   (typed_double, 0.001),
+    'alpha0': (typed_double, 0.001),
+    'beta0':  (typed_double, 0.001),
 
-    '4':      (typed_comment, 'noise prior parameters'),
-    'nu':     (typed_double, 50),
-    'lambda': (typed_double, 0.00125),
+    '4':       (typed_comment, 'noise prior parameters'),
+    'nu0':     (typed_double, 50),
+    'lambda0': (typed_double, 0.00125),
 
     '5':     (typed_comment, 'algorithm parameters'),
     'iters': (typed_size_t, 11000),

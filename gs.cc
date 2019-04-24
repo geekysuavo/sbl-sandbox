@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2018 Bradley Worley <geekysuavo@gmail.com>
+/* Copyright (c) 2018-2019 Bradley Worley <geekysuavo@gmail.com>
  * Released under the MIT License.
  */
 
@@ -33,8 +33,8 @@ int main () {
   Eigen::Matrix<double, m, 1> z1, t;
 
   /* compute the updated shape parameters. */
-  const double t_alpha = alpha + 0.5;
-  const double t_nu = nu + 0.5 * m;
+  const double alpha = alpha0 + 0.5;
+  const double nu = nu0 + 0.5 * m;
 
   /* randomly re-seed the pseudorandom number generator. */
   std::random_device rdev;
@@ -46,13 +46,13 @@ int main () {
     const double ess = (y - A * x).squaredNorm();
 
     /* sample tau. */
-    const double t_lambda = lambda + 0.5 * ess;
-    tau = gamrnd(t_nu, t_lambda);
+    const double lambda = lambda0 + 0.5 * ess;
+    tau = gamrnd(nu, lambda);
 
     /* sample xi. */
     for (std::size_t j = 0; j < n; j++) {
-      const double t_beta = beta + 0.5 * std::pow(x(j), 2);
-      xi(j) = gamrnd(t_alpha, t_beta);
+      const double beta = beta0 + 0.5 * std::pow(x(j), 2);
+      xi(j) = gamrnd(alpha, beta);
     }
 
     /* draw an m-vector of standard normal variates. */
