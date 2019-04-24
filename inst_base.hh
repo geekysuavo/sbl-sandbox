@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2018 Bradley Worley <geekysuavo@gmail.com>
+/* Copyright (c) 2018-2019 Bradley Worley <geekysuavo@gmail.com>
  * Released under the MIT License.
  */
 
@@ -16,10 +16,12 @@ std::default_random_engine gen;
  *  @A: measurement matrix.
  *  @x0: true weight vector.
  *  @y: data vector.
+ *  @L: 2*max(eig(A'*A)).
  */
 Eigen::Matrix<double, m, n> A;
 Eigen::Matrix<double, n, 1> x0;
 Eigen::Matrix<double, m, 1> y;
+double L;
 
 /* instance_init(): initialize the current problem instance.
  */
@@ -74,5 +76,17 @@ static void instance_init () {
     for (std::size_t i = 0; i < m; i++)
       y(i) += sigma * nrm(gen);
   }
+
+  /* construct an eigenvalue solver for the measurement matrix gramian. */
+  Eigen::Matrix<double, n, n> AtA = A.transpose() * A;
+  Eigen::EigenSolver<decltype(AtA)> es(AtA, false);
+
+  /* identify the maximal eigenvalue of the gramian. */
+  L = es.eigenvalues()(0).real();
+  for (std::size_t j = 1; j < n; j++)
+    L = std::max(L, es.eigenvalues()(j).real());
+
+  /* double the result (should be twice the maximal eigenvalue). */
+  L *= 2;
 }
 
