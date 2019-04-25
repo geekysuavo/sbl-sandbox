@@ -12,7 +12,7 @@ int main () {
   Eigen::Matrix<double, n, 1> zeta;
 
   /* compute the projected data vector. */
-  Eigen::Matrix<double, n, 1> Aty = A.transpose() * y;
+//Eigen::Matrix<double, n, 1> Aty = A.transpose() * y;
 
   /* initialize the weight means, variances, and bounding variables. */
   Eigen::Matrix<double, n, 1> u, v, z;

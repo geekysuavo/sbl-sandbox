@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2018-2019 Bradley Worley <geekysuavo@gmail.com>
+/* Copyright (c) 2019 Bradley Worley <geekysuavo@gmail.com>
  * Released under the MIT License.
  */
 
@@ -7,14 +7,8 @@ int main () {
   /* initialize the problem instance. */
   instance_init();
 
-  /* compute the diagonal of the measurement matrix gramian. */
-  Eigen::Matrix<double, n, n> AtA = A.transpose() * A;
-
-  /* compute the projected data vector. */
-  Eigen::Matrix<double, n, 1> Aty = A.transpose() * y;
-
-  /* initialize the weight means and variances. */
-  Eigen::Matrix<double, n, 1> u, v;
+  /* initialize the weight means, variances, and bounding variables. */
+  Eigen::Matrix<double, n, 1> u, v, z;
   u.setZero();
   v.setOnes();
 
@@ -31,14 +25,16 @@ int main () {
 
   /* iterate. */
   for (std::size_t it = 0; it < iters; it++) {
+    /* compute the new "right-hand-side" vector. */
+    z = 0.5 * L * tau * u - tau * A.transpose() * (A * u - y);
+
     /* update each weight factor. */
     for (std::size_t i = 0; i < n; i++) {
       /* update the weight variance. */
       v(i) = 1 / (xi(i) + tau * a(i));
 
       /* update the weight mean. */
-      const double AtAx = AtA.row(i).dot(u) - a(i) * u(i);
-      u(i) = tau * v(i) * (Aty(i) - AtAx);
+      u(i) = z(i) / (0.5 * L * tau + xi(i));
     }
 
     /* update the precision means. */

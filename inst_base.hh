@@ -16,11 +16,16 @@ std::default_random_engine gen;
  *  @A: measurement matrix.
  *  @x0: true weight vector.
  *  @y: data vector.
- *  @L: 2*max(eig(A'*A)).
  */
 Eigen::Matrix<double, m, n> A;
 Eigen::Matrix<double, n, 1> x0;
 Eigen::Matrix<double, m, 1> y;
+
+/* precomputed data:
+ *  @a: diag(A'*A).
+ *  @L: 2*max(eig(A'*A)).
+ */
+Eigen::Matrix<double, n, 1> a;
 double L;
 
 /* instance_init(): initialize the current problem instance.
@@ -80,6 +85,9 @@ static void instance_init () {
   /* construct an eigenvalue solver for the measurement matrix gramian. */
   Eigen::Matrix<double, n, n> AtA = A.transpose() * A;
   Eigen::EigenSolver<decltype(AtA)> es(AtA, false);
+
+  /* get the diagonal elements of the gramian. */
+  a = AtA.diagonal();
 
   /* identify the maximal eigenvalue of the gramian. */
   L = es.eigenvalues()(0).real();
