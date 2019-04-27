@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2018-2019 Bradley Worley <geekysuavo@gmail.com>
+/* Copyright (c) 2019 Bradley Worley <geekysuavo@gmail.com>
  * Released under the MIT License.
  */
 
@@ -9,12 +9,10 @@ int main () {
 
   /* compute the diagonal of the measurement matrix gramian. */
   Eigen::Matrix<double, n, n> AtA = A.transpose() * A;
+  Eigen::Matrix<double, n, 1> zeta;
 
-  /* compute the projected data vector. */
-  Eigen::Matrix<double, n, 1> Aty = A.transpose() * y;
-
-  /* initialize the weight means and variances. */
-  Eigen::Matrix<double, n, 1> u, v;
+  /* initialize the weight means, variances, and bounding variables. */
+  Eigen::Matrix<double, n, 1> u, v, z;
   u.setZero();
   v.setOnes();
 
@@ -31,14 +29,25 @@ int main () {
 
   /* iterate. */
   for (std::size_t it = 0; it < iters; it++) {
+    /* initialize the objective. */
+    double phi = phi0;
+
+    /* update the location of the bound, z. */
+    z = u;
+
+    /* compute the new (scaled) gradient at z. */
+    zeta = A.transpose() * (A * z - y);
+
     /* update each weight factor. */
     for (std::size_t i = 0; i < n; i++) {
       /* update the weight variance. */
-      v(i) = 1 / (xi(i) + tau * a(i));
+      v(i) = 1 / (xi(i) + 0.5 * L * tau);
 
       /* update the weight mean. */
-      const double AtAx = AtA.row(i).dot(u) - a(i) * u(i);
-      u(i) = tau * v(i) * (Aty(i) - AtAx);
+      u(i) = tau * v(i) * (0.5 * L * z(i) - zeta(i));
+
+      /* update the objective. */
+      phi -= 0.5 * std::log(v(i));
     }
 
     /* update the precision means. */
@@ -46,21 +55,24 @@ int main () {
       const double ex2 = std::pow(u(i), 2) + v(i);
       const double beta = beta0 + 0.5 * ex2;
       xi(i) = alpha / beta;
+
+      /* update the objective. */
+      phi += alpha * std::log(beta);
     }
 
     /* update the noise. */
-    const double trAAV = a.dot(v);
     const double mess = (y - A * u).squaredNorm();
+    const double trAAV = (AtA * v.asDiagonal()).trace();
     const double lambda = lambda0 + 0.5 * mess + 0.5 * trAAV;
     tau = nu / lambda;
+
+    /* output the objective. */
+    phi += nu * std::log(lambda);
+    std::cerr << it << " " << phi << "\n";
   }
 
-  /* output the final means. */
+  /* output the final means and variances. */
   for (std::size_t i = 0; i < n; i++)
-    std::cout << u(i) << (i + 1 == n ? "\n" : " ");
-
-  /* output the final variances. */
-  for (std::size_t i = 0; i < n; i++)
-    std::cout << v(i) << (i + 1 == n ? "\n" : " ");
+    std::cout << u(i) << " " << v(i) << "\n";
 }
 

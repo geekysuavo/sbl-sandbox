@@ -25,6 +25,9 @@ int main () {
 
   /* iterate. */
   for (std::size_t it = 0; it < iters; it++) {
+    /* initialize the objective. */
+    double phi = phi0;
+
     /* compute the new "right-hand-side" vector. */
     z = 0.5 * L * tau * u - tau * A.transpose() * (A * u - y);
 
@@ -35,13 +38,20 @@ int main () {
 
       /* update the weight mean. */
       u(i) = z(i) / (0.5 * L * tau + xi(i));
+
+      /* update the objective. */
+      phi -= 0.5 * std::log(v(i));
     }
 
     /* update the precision means. */
     for (std::size_t i = 0; i < n; i++) {
+      /* update xi(i). */
       const double ex2 = std::pow(u(i), 2) + v(i);
       const double beta = beta0 + 0.5 * ex2;
       xi(i) = alpha / beta;
+
+      /* update the objective. */
+      phi += alpha * std::log(beta);
     }
 
     /* update the noise. */
@@ -49,14 +59,14 @@ int main () {
     const double mess = (y - A * u).squaredNorm();
     const double lambda = lambda0 + 0.5 * mess + 0.5 * trAAV;
     tau = nu / lambda;
+
+    /* output the objective. */
+    phi += nu * std::log(lambda);
+    std::cerr << it << " " << phi << "\n";
   }
 
-  /* output the final means. */
+  /* output the final means and variances. */
   for (std::size_t i = 0; i < n; i++)
-    std::cout << u(i) << (i + 1 == n ? "\n" : " ");
-
-  /* output the final variances. */
-  for (std::size_t i = 0; i < n; i++)
-    std::cout << v(i) << (i + 1 == n ? "\n" : " ");
+    std::cout << u(i) << " " << v(i) << "\n";
 }
 

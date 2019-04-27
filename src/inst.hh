@@ -8,6 +8,14 @@
 #include <iostream>
 #include <Eigen/Dense>
 
+/* instance-constant expressions:
+ *  @alpha: weight posterior shape parameter.
+ *  @nu: noise posterior shape parameter.
+ */
+constexpr double pi = 3.14159265358979323846264338327950288;
+constexpr double alpha = alpha0 + 0.5;
+constexpr double nu = nu0 + 0.5 * m;
+
 /* global pseudorandom number generator:
  */
 std::default_random_engine gen;
@@ -22,11 +30,12 @@ Eigen::Matrix<double, n, 1> x0;
 Eigen::Matrix<double, m, 1> y;
 
 /* precomputed data:
- *  @a: diag(A'*A).
- *  @L: 2*max(eig(A'*A)).
+ *  @a: vector of diagonal elements of the measurement gramian.
+ *  @L: twice the maximal eigenvalue of the measurement gramian.
+ *  @phi0: constant offset term of the universal sbl objective.
  */
 Eigen::Matrix<double, n, 1> a;
-double L;
+double L, phi0;
 
 /* instance_init(): initialize the current problem instance.
  */
@@ -96,5 +105,12 @@ static void instance_init () {
 
   /* double the result (should be twice the maximal eigenvalue). */
   L *= 2;
+
+  /* compute the constant offset to the sbl objective. */
+  phi0 = 0.5 * (m + n) * std::log(2 * pi)
+       - nu0 * std::log(lambda0)
+       - n * alpha0 * std::log(beta0)
+       - (std::lgamma(nu) - std::lgamma(nu0))
+       - n * (std::lgamma(alpha) - std::lgamma(alpha0));
 }
 

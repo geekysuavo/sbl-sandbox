@@ -21,7 +21,7 @@ constexpr std::size_t n = 100;
  */
 constexpr bool unif = true;
 constexpr std::size_t k = 10;
-constexpr double sigma = 0.005;
+constexpr double sigma = 0.001;
 constexpr std::size_t seed = 47351;
 
 /* weight prior parameters:
@@ -35,18 +35,18 @@ constexpr double beta0 = 0.001;
  *  @nu0: shape.
  *  @lambda0: rate.
  */
-constexpr double nu0 = 50;
-constexpr double lambda0 = 0.00125;
+constexpr double nu0 = 0.001;
+constexpr double lambda0 = 0.001;
 
 /* algorithm parameters:
  *  @iters: iteration count.
  *  @burn: (monte carlo) burn-in iteration count.
  *  @thin: (monte carlo) thinning iteration count.
  */
-constexpr std::size_t iters = 11000;
-constexpr std::size_t burn = 1000;
+constexpr std::size_t iters = 250;
+constexpr std::size_t burn = 10;
 constexpr std::size_t thin = 1;
 
 /* include the base instance functions. */
-#include "inst_base.hh"
+#include "src/inst.hh"
 
