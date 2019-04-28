@@ -7,13 +7,6 @@ int main () {
   /* initialize the problem instance. */
   instance_init();
 
-  /* initialize the weight means, variances, and running variables. */
-  Eigen::Matrix<double, n, 1> M1, M2, mu, s2;
-  M1.setZero();
-  M2.setZero();
-  mu.setZero();
-  s2.setZero();
-
   /* declare variables for sampling tau, xi. */
   std::gamma_distribution<double> gam;
   using gam_param_t = typename decltype(gam)::param_type;
@@ -23,11 +16,34 @@ int main () {
     return gam(gen);
   };
 
+  /* complete log-conditionals of tau, xi. */
+  auto lgampdf = [] (double z, double a, double b) -> double {
+    return a * std::log(b) - std::lgamma(a) + (a - 1) * std::log(z) - b * z;
+  };
+
+  /* initialize the weight means, variances, and running variables. */
+  Eigen::Matrix<double, n, 1> M1, M2, xbar, s2;
+  xbar.setZero();
+  s2.setZero();
+  M1.setZero();
+  M2.setZero();
+
+  /* initialize the precision (posterior) means. */
+  Eigen::Matrix<double, n, 1> xibar;
+  double taubar = 0;
+  xibar.setZero();
+
+  /* initialize the posterior marginal estimates. */
+  double ptau = 0;
+  double pxi = 0;
+  double px = 0;
+
   /* initialize the noise sample. */
   double tau = 0;
 
   /* initialize the precision sample. */
-  Eigen::Matrix<double, n, 1> xi;
+  Eigen::Matrix<double, n, 1> beta, xi;
+  beta.setZero();
   xi.setZero();
 
   /* initialize the weight sample. */
@@ -58,8 +74,9 @@ int main () {
 
     /* sample xi. */
     for (std::size_t j = 0; j < n; j++) {
-      const double beta = beta0 + 0.5 * std::pow(x(j), 2);
-      xi(j) = gamrnd(alpha, beta);
+      const double beta_j = beta0 + 0.5 * std::pow(x(j), 2);
+      xi(j) = gamrnd(alpha, beta_j);
+      beta(j) = beta_j;
     }
 
     /* draw an m-vector of standard normal variates. */
@@ -79,31 +96,89 @@ int main () {
      * x = (u - A' * t) ./ xi
      */
     u = tau * A.transpose() * y + z3;
-    t = (Eigen::Matrix<double, m, m>::Identity() / tau +
-         A * xi.cwiseInverse().asDiagonal() * A.transpose())
-        .llt().solve(A * u.cwiseQuotient(xi));
+    auto lltQ = (Eigen::Matrix<double, m, m>::Identity() / tau +
+                 A * xi.cwiseInverse().asDiagonal() * A.transpose()).llt();
+    t = lltQ.solve(A * u.cwiseQuotient(xi));
     x = (u - A.transpose() * t).cwiseQuotient(xi);
 
     /* check if the sample should be stored. */
     if (it >= burn && (it - burn) % thin == 0) {
       /* compute the sample count. */
-      const double itt = (it - burn) / thin;
+      const double itt = (it - burn) / thin + 1;
 
-      /* update the first moment. */
-      M1 = x - mu;
-      mu += M1 / itt;
+      /* update the first moment of x. */
+      M1 = x - xbar;
+      xbar += M1 / itt;
 
-      /* update the second moment. */
-      M2 += M1.cwiseProduct(x - mu);
+      /* update the second moment of x. */
+      M2 += M1.cwiseProduct(x - xbar);
       s2 = M2 / itt;
-    }
 
-    /* FIXME: output the current likelihood value. */
-    std::cerr << it << " " << 0.0 << "\n";
+      /* update the posterior mean estimate of tau. */
+      taubar += (tau - taubar) / itt;
+
+      /* update the posterior mean estimate of xi. */
+      xibar += (xi - xibar) / itt;
+
+      /* compute the log-determinant of the covariance matrix
+       * of the complete conditional of x.
+       */
+      double lndetS = m * std::log(tau);
+      for (std::size_t i = 0; i < m; i++)
+        lndetS += 2 * std::log(lltQ.matrixL()(i,i));
+      for (std::size_t j = 0; j < n; j++)
+        lndetS += std::log(xi(j));
+
+      /* compute the complete log-conditional of x. */
+      const double Q1 = tau * (A * M1).squaredNorm();
+      const double Q2 = M1.transpose() * xi.cwiseProduct(M1);
+      const double Q = -0.5 * (Q1 + Q2) - 0.5 * lndetS
+                       - 0.5 * n * std::log(2 * pi);
+
+      /* compute the reduced complete conditional of x. (no log!) */
+      px += (std::exp(Q) - px) / itt;
+
+      /* compute the reduced complete log-conditional of tau. */
+      const double essbar = (y - A * xbar).squaredNorm();
+      const double l = lambda0 + 0.5 * essbar;
+      ptau = lgampdf(taubar, nu, l);
+
+      /* compute the reduced complete log-conditional of xi. */
+      pxi = 0;
+      for (std::size_t j = 0; j < n; j++) {
+        const double b = beta0 + 0.5 * std::pow(xbar(j), 2);
+        pxi += lgampdf(xibar(j), alpha, b);
+      }
+
+      /* log-likelihood: ln p(y|xbar,taubar). */
+      double lml = 0;
+      lml += -0.5 * taubar * essbar
+             + 0.5 * m * std::log(taubar / (2 * pi));
+
+      /* conditional weight prior: ln p(xbar|xibar). */
+      lml += -0.5 * xbar.transpose() * xibar.cwiseProduct(xbar)
+             - 0.5 * n * std::log(2 * pi);
+      for (std::size_t j = 0; j < n; j++)
+        lml += 0.5 * std::log(xibar(j));
+
+      /* weight precision prior: ln p(xibar). */
+      for (std::size_t j = 0; j < n; j++)
+        lml += lgampdf(xibar(j), alpha0, beta0);
+
+      /* noise precision prior: ln p(taubar). */
+      lml += lgampdf(taubar, nu0, lambda0);
+
+      /* finally, subtract the log-posterior ordinal estimate. */
+      const double lpo = std::log(px) + pxi + ptau;
+      lml -= lpo;
+
+      /* output the current marginal likelihood estimate. */
+      std::cerr << itt << " " << lml << "\n";
+    }
   }
 
   /* output the final means and variances. */
   for (std::size_t i = 0; i < n; i++)
-    std::cout << mu(i) << " " << s2(i) << "\n";
+    std::cout << xbar(i) << " " << s2(i) << "\n";
 }
 

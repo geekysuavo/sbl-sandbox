@@ -37,9 +37,8 @@ int main () {
      * Q = inv(eye(m) ./ tau + K)
      */
     K = A * xi.cwiseInverse().asDiagonal() * A.transpose();
-    auto L = (Eigen::Matrix<double, m, m>::Identity() / tau + K).llt();
-  //Q = (Eigen::Matrix<double, m, m>::Identity() / tau + K).inverse();
-    Q = L.solve(Eigen::Matrix<double, m, m>::Identity());
+    auto lltQ = (Eigen::Matrix<double, m, m>::Identity() / tau + K).llt();
+    Q = lltQ.solve(Eigen::Matrix<double, m, m>::Identity());
 
     /* update the weight means. */
     t = Q * K * y;
@@ -52,7 +51,7 @@ int main () {
     /* compute the log-determinant of the kernel matrix. */
     double lndetQ = 0;
     for (std::size_t j = 0; j < m; j++)
-      lndetQ += 2 * std::log(L.matrixL()(j,j));
+      lndetQ += 2 * std::log(lltQ.matrixL()(j,j));
 
     /* compute the log-determinant of the full covariance matrix. */
     double lndetGamma = lndetQ + m * std::log(tau);
