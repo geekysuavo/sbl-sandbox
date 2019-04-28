@@ -145,8 +145,7 @@ def task_solve():
 
       # execute the compilation command.
       args = ['g++', '-std=c++14', '-I.', '-Ieigen3',
-              '-include', header,
-              source, '-o', binary]
+              '-include', header, source, '-o', binary]
       proc = subprocess.run(args)
 
       # execute the solver.
