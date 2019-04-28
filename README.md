@@ -1,13 +1,16 @@
 
 # The SBL sandbox
 
-Fix me...
+The **sbl-sandbox** sources are a nice padded area in which we are safe
+to play around with methods in _sparse Bayesian learning_. They are
+essentially a set of lightweight solvers paired with some python
+code that generates problem instances of the "_k_ spikes measured
+with or without noise by an i.i.d. Gaussian random matrix" variety.
 
-These sources support the following manuscript, _in preparation for
-submission to_:
+These sources support the following manuscript:
 
 > Worley, B., _Scalable mean-field sparse Bayesian learning_,
-> IEEE Transactions on Signal Processing, 2019.
+> IEEE Transactions on Signal Processing, 2019, **in prep**.
 
 ## Usage
 
@@ -23,9 +26,26 @@ g++ -std=c++14 -I. -I/path/to/eigen3 \
   src/gs.cc -o gs
 ```
 
-Normally, this compilation isn't necessary. The compilations needed
+Normally, manual compilation isn't necessary. The compilations needed
 to perform all experiments are managed by __make.py__ using
 [doit](http://pydoit.org).
+
+## Preparation on *m5.metal*
+
+The following commands are needed before running __make.py__ on EC2:
+```bash
+sudo yum -y groupinstall "Development Tools"
+sudo amazon-linux-extras install python3
+sudo pip3 install --upgrade pip
+sudo pip3 install doit
+```
+
+Then, clone this repository and run:
+```bash
+git clone git@github.com:geekysuavo/sbl-sandbox.git
+cd sbl-sandbox
+./make.py -n 96
+```
 
 ## Licensing
 

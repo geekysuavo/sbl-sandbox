@@ -86,6 +86,18 @@ expts = {
   'converg': tuple(convergence())
 }
 
+# task_eigen3: task generator used to download the eigen3 sources.
+def task_eigen3():
+  import os
+  return {
+    'actions': ['wget http://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz',
+                'tar xf 3.3.7.tar.gz',
+                'rm -f 3.3.7.tar.gz',
+                'mv eigen* eigen3'],
+    'uptodate': [os.path.isdir('eigen3')],
+    'targets': ['eigen3']
+  }
+
 # task_solve: task generator used by doit to manage experimental results.
 def task_solve():
   # solve: task python action.
@@ -131,14 +143,15 @@ def task_solve():
       binary = f'{wd}/{ident}.{solver}'
 
       # execute the compilation command.
-      args = ['g++', '-std=c++14',
-              '-I.', '-I/usr/local/include/eigen3',
+      args = ['g++', '-std=c++14', '-I.', '-Ieigen3',
               '-include', header,
               source, '-o', binary]
       proc = subprocess.run(args)
 
       # execute the solver.
-      proc = subprocess.run([binary], capture_output=True, text=True)
+      proc = subprocess.run([binary], encoding='utf-8',
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE)
 
       # tupify: parse a string into a tuple of tuples.
       def tupify(lines):
@@ -182,6 +195,7 @@ def task_solve():
       yield {
         'name': name,
         'actions': [(solve, [ident, parms])],
+        'task_dep': ['eigen3'],
         'targets': [target]
       }
 
