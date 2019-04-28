@@ -76,7 +76,7 @@ def phases():
 def convergence():
   for seed in list(seeds())[:5]:
     for unif in (True, False):
-      yield {**defaults, 'seed': seed, 'iters': 10000,
+      yield {**defaults, 'seed': seed, 'iters': 10000, 'burn': 1000,
              'solvers': ('gs', 'smf', 'mf', 'fmf', 'if')}
 
 # combine groups of tasks into named experiments.

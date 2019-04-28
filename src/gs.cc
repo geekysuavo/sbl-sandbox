@@ -7,6 +7,13 @@ int main () {
   /* initialize the problem instance. */
   instance_init();
 
+  /* initialize the weight means, variances, and running variables. */
+  Eigen::Matrix<double, n, 1> M1, M2, mu, s2;
+  M1.setZero();
+  M2.setZero();
+  mu.setZero();
+  s2.setZero();
+
   /* declare variables for sampling tau, xi. */
   std::gamma_distribution<double> gam;
   using gam_param_t = typename decltype(gam)::param_type;
@@ -41,7 +48,7 @@ int main () {
   gen.seed(rdev());
 
   /* iterate. */
-  for (std::size_t it = 0; it < iters; it++) {
+  for (std::size_t it = 0; it < burn + iters; it++) {
     /* compute the error sum of squares. */
     const double ess = (y - A * x).squaredNorm();
 
@@ -78,12 +85,25 @@ int main () {
     x = (u - A.transpose() * t).cwiseQuotient(xi);
 
     /* check if the sample should be stored. */
-    if (it >= burn && it % thin == 0) {
-      for (std::size_t i = 0; i < n; i++)
-        std::cout << x(i) << (i + 1 == n ? "" : " ");
+    if (it >= burn && (it - burn) % thin == 0) {
+      /* compute the sample count. */
+      const double itt = (it - burn) / thin;
 
-      std::cout << std::endl;
+      /* update the first moment. */
+      M1 = x - mu;
+      mu += M1 / itt;
+
+      /* update the second moment. */
+      M2 += M1.cwiseProduct(x - mu);
+      s2 = M2 / itt;
     }
+
+    /* FIXME: output the current likelihood value. */
+    std::cerr << it << " " << 0.0 << "\n";
   }
+
+  /* output the final means and variances. */
+  for (std::size_t i = 0; i < n; i++)
+    std::cout << mu(i) << " " << s2(i) << "\n";
 }
 
