@@ -89,8 +89,9 @@ expts = {
 # task_eigen3: task generator used to download the eigen3 sources.
 def task_eigen3():
   import os
+  eigen_url = 'http://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz'
   return {
-    'actions': ['wget http://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz',
+    'actions': [f'wget -q {eigen_url}',
                 'tar xf 3.3.7.tar.gz',
                 'rm -f 3.3.7.tar.gz',
                 'mv eigen* eigen3'],
