@@ -93,7 +93,6 @@ def task_solve():
     import subprocess
     import pickle
     import gzip
-    import sys #FIXME
     import os
 
     # ensure the working directory exists.
