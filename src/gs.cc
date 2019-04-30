@@ -3,9 +3,9 @@
  * Released under the MIT License.
  */
 
-int main () {
+int main (int argc, char **argv) {
   /* initialize the problem instance. */
-  instance_init();
+  instance_init(argc, argv);
 
   /* declare variables for sampling tau, xi. */
   std::gamma_distribution<double> gam;
@@ -172,8 +172,8 @@ int main () {
       const double lpo = std::log(px) + pxi + ptau;
       lml -= lpo;
 
-      /* output the current marginal likelihood estimate. */
-      std::cerr << itt << " " << lml << "\n";
+      /* output the current negated log-marginal likelihood estimate. */
+      std::cerr << itt << " " << -lml << "\n";
     }
   }
 

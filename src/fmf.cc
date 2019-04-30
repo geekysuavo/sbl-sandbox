@@ -3,9 +3,9 @@
  * Released under the MIT License.
  */
 
-int main () {
+int main (int argc, char **argv) {
   /* initialize the problem instance. */
-  instance_init();
+  instance_init(argc, argv);
 
   /* initialize the weight means, variances, and bounding variables. */
   Eigen::Matrix<double, n, 1> u, v, z;

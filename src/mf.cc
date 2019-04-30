@@ -3,9 +3,9 @@
  * Released under the MIT License.
  */
 
-int main () {
+int main (int argc, char **argv) {
   /* initialize the problem instance. */
-  instance_init();
+  instance_init(argc, argv);
 
   /* compute the diagonal of the measurement matrix gramian. */
   Eigen::Matrix<double, n, n> AtA = A.transpose() * A;

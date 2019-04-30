@@ -21,7 +21,7 @@ paired with the core instance header __src/inst.hh__ and a solver,
 _e.g._ __src/gs.cc__. Compiling would go a bit something like this:
 
 ```bash
-g++ -std=c++14 -I. -I/path/to/eigen3 \
+g++ -std=c++14 -O3 -I. -I/path/to/eigen3 \
   -include src/instdef.hh -include src/inst.hh \
   src/gs.cc -o gs
 ```
