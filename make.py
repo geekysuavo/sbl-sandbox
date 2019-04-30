@@ -3,6 +3,7 @@
 # task generator imports.
 from sandbox.eigen import task_eigen3
 from sandbox.solvers import task_solver
+from sandbox.packages import task_package
 from sandbox.experiments import task_experiment
 
 # script entry point.
