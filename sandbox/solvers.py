@@ -39,6 +39,7 @@ def task_solver():
     target = os.path.join('bin', name)
     header = os.path.join('src', 'inst.hh')
     source = os.path.join('src', f'{meth}.cc')
+
     yield {
       'name': name,
       'actions': [(create_folder, ['bin']),
