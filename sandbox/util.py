@@ -8,33 +8,31 @@ def seeds():
   random.seed(4735921)
   return {random.randint(99, 9999999) for i in range(num_seeds)}
 
-# phases: yields a grid of instances from which phase diagrams
-# can be (roughly) estimated.
-#
-def phases():
-  for seed in seeds():
-    for unif in (True, False):
-      for sigma in (0, 0.001, 0.01, 0.1):
-        for m in range(5, 95+1, 5):
-          for k in range(5, m+1, 5):
-            yield {'m': m, 'n': 100, 'k': k,
-                   'seed': seed, 'unif': unif, 'sigma': sigma,
-                   'methods': ('smf', 'mf', 'fmf', 'if')}
-
 # convergence: yields instances with 10x longer iteration counts
 # to compare convergence of each method.
-#
 def convergence():
-  for seed in list(seeds())[:5]:
+  for seed in list(seeds())[:10]:
     for unif in (True, False):
       yield {'m': 50, 'n': 100,
              'seed': seed, 'iters': 10000, 'burn': 1000, 'thin': 10,
              'methods': ('gs', 'smf', 'mf', 'fmf', 'if')}
 
+# errors: yields a grid of instances from which normalized
+# mean square error curves can be generated.
+def errors(sigma=0):
+  for seed in seeds():
+    for unif in (True, False):
+      for m in range(5, 95+1, 5):
+        for k in range(5, m+1, 5):
+          yield {'m': m, 'n': 100, 'k': k,
+                 'seed': seed, 'unif': unif, 'sigma': sigma,
+                 'methods': ('smf', 'mf', 'fmf', 'if', 'oracle')}
+
 # combine groups of tasks into named experiments.
 expts = {
-  'phases': tuple(phases()),
-  'converg': tuple(convergence())
+  'convergence': tuple(convergence()),
+  **{f'errors{sigma}': tuple(errors(sigma))
+     for sigma in (0, 0.001, 0.01, 0.1)}
 }
 
 # solvers: yields all unique (method, m, n) combinations required by
