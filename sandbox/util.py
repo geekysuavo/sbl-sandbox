@@ -24,9 +24,9 @@ def errors(sigma=0):
     for unif in (True, False):
       for m in range(5, 95+1, 5):
         for k in range(5, m+1, 5):
-          yield {'m': m, 'n': 100, 'k': k,
+          yield {'m': m, 'n': 100, 'k': k, 'burn': 500,
                  'seed': seed, 'unif': unif, 'sigma': sigma,
-                 'methods': ('smf', 'mf', 'fmf', 'if', 'oracle')}
+                 'methods': ('gs', 'smf', 'mf', 'fmf', 'if', 'oracle')}
 
 # combine groups of tasks into named experiments.
 expts = {

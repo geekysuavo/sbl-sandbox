@@ -12,17 +12,13 @@ def task_package():
   def package(expt, targets):
     # build the list of pickle files to load.
     deps = [os.path.join('expts', expt, f'{idx+1:06d}.gz')
-            for idx in range(len(tasks))]
+            for idx in range(len(expts[expt]))]
 
     # combine the results.
-    results = []
-    for dep in deps:
-      # load the pickle file.
-      with gzip.open(dep) as f:
-        data = pickle.load(f)
-
-      # add the loaded data into the results.
-      results.append(data)
+    results = [None] * len(deps)
+    for idx in range(len(deps)):
+      with gzip.open(deps[idx]) as f:
+        results[idx] = pickle.load(f)
 
     # write the results to the target file.
     with gzip.open(targets[0], 'wb') as f:
