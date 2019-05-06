@@ -90,7 +90,7 @@ auto schedule_vector (const data_table& data, std::size_t n) {
   for (std::size_t i = 0; i < n; i++)
     sched[i] = 0;
 
-  for (auto &item : data)
+  for (auto& item : data)
     sched[std::get<0>(item)] = 1;
 
   return std::move(sched);

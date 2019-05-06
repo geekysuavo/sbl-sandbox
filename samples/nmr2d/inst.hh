@@ -179,7 +179,7 @@ auto schedule_vector (const data_table& data, const size_array& N) {
   for (std::size_t i = 0; i < n; i++)
     sched[i] = 0;
 
-  for (auto &item : data) {
+  for (auto& item : data) {
     const std::size_t si = std::get<0>(item);
     const std::size_t sj = std::get<1>(item);
     const std::size_t idx = si + N[0] * sj;
