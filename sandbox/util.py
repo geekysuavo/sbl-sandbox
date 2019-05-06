@@ -13,8 +13,8 @@ def seeds():
 def convergence():
   for seed in list(seeds())[:10]:
     for unif in (True, False):
-      yield {'m': 50, 'n': 100,
-             'seed': seed, 'iters': 10000, 'burn': 1000, 'thin': 10,
+      yield {'m': 50, 'n': 100, 'seed': seed, 'unif': unif,
+             'iters': 10000, 'burn': 1000, 'thin': 10,
              'methods': ('gs', 'smf', 'mf', 'fmf', 'if')}
 
 # errors: yields a grid of instances from which normalized
