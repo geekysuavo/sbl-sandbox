@@ -138,7 +138,11 @@ private:
 
 /* load(): construct a data table from a file.
  */
-auto load (const std::string& filename) {
+auto load (int argc, char **argv) {
+  std::string filename = "inst.hh";
+  if (argc >= 2)
+    filename = argv[1];
+
   std::ifstream ifs;
   ifs.open(filename, std::ifstream::in);
 

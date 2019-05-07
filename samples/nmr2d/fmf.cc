@@ -8,9 +8,9 @@
 
 #include "inst.hh"
 
-int main () {
+int main (int argc, char **argv) {
   /* read the instance data from disk. */
-  auto data = load("inst.dat");
+  auto data = load(argc, argv);
 
   /* problem sizes. */
   constexpr size_array N = { 2048, 2048 };
