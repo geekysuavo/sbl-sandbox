@@ -439,7 +439,7 @@ def figure6(targets):
 
   # prepare the figure for plotting.
   setparams()
-  fig, (top, middle, bottom) = plt.subplots(nrows=3, figsize=(2.5, 6),
+  fig, (top, middle, bottom) = plt.subplots(nrows=3, figsize=(2.5, 4.5),
                                             sharex=True)
   
   # plot the ground truth panel.
