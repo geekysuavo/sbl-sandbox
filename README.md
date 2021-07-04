@@ -10,15 +10,15 @@ with or without noise by an i.i.d. Gaussian random matrix" variety.
 These sources support the following manuscript:
 
 > Worley, B., _Scalable mean-field sparse Bayesian learning_,
-> IEEE Transactions on Signal Processing, 2019, **in prep**.
+> IEEE Transactions on Signal Processing, 2019, 67(24): 6314--6326.
 
 ## Usage
 
 Bear with me, compilation is a bit non-standard.
 
-To compile a source file, a problem instance, _e.g._ __src/instdef.hh__, is
-paired with the core instance header __src/inst.hh__ and a solver,
-_e.g._ __src/gs.cc__. Compiling would go a bit something like this:
+To compile a source file, a problem instance, _e.g._ `src/instdef.hh`, is
+paired with the core instance header `src/inst.hh` and a solver,
+_e.g._ `src/gs.cc`. Compiling would go a bit something like this:
 
 ```bash
 g++ -std=c++14 -O3 -I. -I/path/to/eigen3 \
@@ -27,12 +27,12 @@ g++ -std=c++14 -O3 -I. -I/path/to/eigen3 \
 ```
 
 Normally, manual compilation isn't necessary. The compilations needed
-to perform all experiments are managed by __make.py__ using
+to perform all experiments are managed by `make.py` using
 [doit](http://pydoit.org).
 
 ## Preparation on *m5.metal*
 
-The following commands are needed before running __make.py__ on EC2:
+The following commands are needed before running `make.py` on EC2:
 ```bash
 sudo yum -y groupinstall "Development Tools"
 sudo amazon-linux-extras install python3
@@ -52,6 +52,3 @@ cd sbl-sandbox
 All sources in this repository are released under the
 [MIT license](https://opensource.org/licenses/MIT). See the
 [LICENSE.md](LICENSE.md) file for the complete license terms.
-
-~ Brad.
-
